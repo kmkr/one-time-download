@@ -3,8 +3,17 @@ var http = require('http'),
     path = require('path');
 
 var dls = [];
-var files = fileSystem.readdirSync(__dirname);
-console.log('Exposing files ' + files.join(', ') + ' for one-time download');
+var blacklist = [ 'one-time-download.js' ];
+var whitelistRegexp = process.argv.length > 1 ? new RegExp(process.argv[2]) : /.*/
+var files = fileSystem.readdirSync(__dirname)
+  .filter(function (file) {
+    return blacklist.indexOf(file) === -1;
+  })
+  .filter(function (file) {
+    return file.match(whitelistRegexp);
+  })
+  .sort();
+console.log('Exposing file(s) "' + files.join(', ') + '" for one-time download');
 
 function getIndex(url) {
   var match;
